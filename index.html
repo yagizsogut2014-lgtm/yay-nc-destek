@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamForge Ultimate - Streaming Topluluk Platformu</title>
+    <!-- Tailwind CSS for modern utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        darkBg: '#09090b',
+                        cardBg: '#121216',
+                        cardHover: '#1a1a24',
+                        neonPurple: '#8b5cf6',
+                        neonBlue: '#3b82f6',
+                        neonGreen: '#10b981',
+                        neonAmber: '#f59e0b'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        glow: {
+                            '0%': { opacity: 0.4 },
+                            '100%': { opacity: 0.8 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: #f4f4f5;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 22, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-header {
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #c084fc 0%, #60a5fa 50%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #6d28d9 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Background Animated Glow Spheres */
+        .glow-sphere-1 {
+            position: fixed; top: -15vh; left: -15vw; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%; z-index: -1; pointer-events: none;
+            animation: float 8s ease-in-out infinite;
+        }
+        .glow-sphere-2 {
+            position: fixed; bottom: -15vh; right: -15vw; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%; z-index: -1; pointer-events: none;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+
+    <div class="glow-sphere-1"></div>
+    <div class="glow-sphere-2"></div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <header class="glass-header sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between transition-all">
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="showPage('home')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-bolt text-white text-lg"></i>
+            </div>
+            <span class="text-xl font-extrabold tracking-tight text-white">Stream<span class="text-amber-400">Forge</span></span>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-1 bg-zinc-900/60 p-1.5 rounded-full border border-zinc-800/80">
+            <button onclick="showPage('home')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="home">Ana Sayfa</button>
+            <button onclick="showPage('chat')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="chat">Global Sohbet</button>
+            <button onclick="showPage('tartisma')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="tartisma">Tartışma & Öneriler</button>
+            <button onclick="showPage('yayincilar')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="yayincilar">Destek Yayıncılar</button>
+            <button onclick="showPage('basvuru')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="basvuru">Yayıncı Başvurusu</button>
+            <button onclick="showPage('destek')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="destek">7/24 Destek</button>
+            <button onclick="showPage('admin')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50 flex items-center gap-1.5" data-target="admin">
+                <i class="fa-solid fa-shield-halved text-xs text-purple-400"></i> Admin
+            </button>
+        </nav>
+
+        <!-- User Authentication Area / Mobile menu trigger -->
+        <div class="flex items-center gap-3">
+            <div id="userArea" class="flex items-center gap-3">
+                <button onclick="openAuthModal('login')" class="px-5 py-2 rounded-full text-sm font-semibold text-white border border-zinc-700 hover:border-purple-500 hover:bg-purple-500/10 transition-all">Giriş Yap</button>
+                <button onclick="openAuthModal('register')" class="hidden sm:inline-block px-5 py-2 rounded-full text-sm font-semibold text-white gradient-btn shadow-lg shadow-purple-600/20">Kayıt Ol</button>
+            </div>
+            <!-- Mobile Menu Button -->
+            <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl bg-zinc-800/80 text-zinc-300 hover:text-white">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileMenu" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex-col p-6 justify-between lg:hidden transition-all">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-white"></i>
+                </div>
+                <span class="text-lg font-extrabold text-white">Stream<span class="text-amber-400">Forge</span></span>
+            </div>
+            <button onclick="toggleMobileMenu()" class="p-2 text-zinc-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="flex flex-col gap-2.5 flex-1 overflow-y-auto py-2">
+            <button onclick="showPage('home'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-house mr-3 text-purple-400"></i> Ana Sayfa</button>
+            <button onclick="showPage('chat'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-comments mr-3 text-purple-400"></i> Global Sohbet</button>
+            <button onclick="showPage('tartisma'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-lightbulb mr-3 text-purple-400"></i> Tartışma & Öneriler</button>
+            <button onclick="showPage('yayincilar'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-heart mr-3 text-purple-400"></i> Destek Yayıncılar</button>
+            <button onclick="showPage('basvuru'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-file-pen mr-3 text-purple-400"></i> Yayıncı Başvurusu</button>
+            <button onclick="showPage('destek'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-headset mr-3 text-purple-400"></i> 7/24 Destek</button>
+            <button onclick="showPage('admin'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-shield-halved mr-3 text-purple-400"></i> Admin Paneli</button>
+        </div>
+        <div id="mobileAuthArea" class="pt-4 border-t border-zinc-800 flex flex-col gap-3"></div>
+    </div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. ANA SAYFA -->
+        <div id="home" class="page active">
+            <div class="relative py-12 md:py-20 text-center flex flex-col items-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs sm:text-sm font-semibold mb-6 animate-bounce">
+                    <i class="fa-solid fa-fire text-amber-400"></i> Kick & Canlı Yayın Ekosistemi Topluluk Gücü
+                </div>
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mb-6 leading-tight">
+                    Streaming Dünyasını Birlikte <span class="gradient-text">İyileştiriyoruz</span>
+                </h1>
+                <p class="text-zinc-400 text-base sm:text-lg max-w-2xl mb-10 leading-relaxed">
+                    Kick ve diğer platformlardaki moderasyon sıkıntılarını, ödeme sorunlarını konuşuyor, ortak çözümler üretiyor ve içerik üreticilerine 7/24 kesintisiz destek sağlıyoruz.
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <button onclick="showPage('chat')" class="px-8 py-4 rounded-full text-white font-semibold gradient-btn shadow-xl shadow-purple-600/25 flex items-center gap-3 group">
+                        <i class="fa-solid fa-comments text-lg"></i> Sohbete Hemen Katıl
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    <button onclick="showPage('yayincilar')" class="px-8 py-4 rounded-full text-white font-semibold glass-panel hover:bg-zinc-800/80 transition-all flex items-center gap-2 border-zinc-700">
+                        <i class="fa-solid fa-users text-purple-400"></i> Desteklenen Yayıncılar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feature Highlights Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-purple-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Canlı Global Sohbet</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed">Topluluk üyeleriyle anlık fikir alışverişinde bulunun, sorunları ve en son yayın trendlerini tartışın.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-blue-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-shield-heart"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Yayıncı Destek Ağı</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed">Başvurunuz onaylandığında kanalınız binlerce kullanıcıya vitrinde sergilenir, dayanışma büyür.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-emerald-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">7/24 Teknik Çözüm</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed">Haksız ban, ödeme gecikmeleri veya teknik aksaklıklar için destek talebi açın, ekibimiz inceleyip çözsün.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. GLOBAL SOHBET -->
+        <div id="chat" class="page">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-comments text-purple-400"></i> Global Sohbet
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-1">Topluluk ile anlıksal, Firestore tabanlı gerçek zamanlı mesajlaşma odası.</p>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Canlı Bağlantı Aktif
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl border border-zinc-800 flex flex-col h-[650px] overflow-hidden shadow-2xl">
+                <!-- Chat Message Scroll Area -->
+                <div id="chat-box" class="flex-1 p-6 overflow-y-auto flex flex-col gap-4">
+                    <div class="flex items-center justify-center h-full text-zinc-500">
+                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> Mesajlar yükleniyor...
+                    </div>
+                </div>
+                <!-- Chat Input Bar -->
+                <div class="p-4 bg-zinc-950/80 border-t border-zinc-800/80 flex items-center gap-3">
+                    <input type="text" id="msgInput" placeholder="Mesajınızı yazın (Max 400 karakter)..." maxlength="400"
+                        class="flex-1 bg-zinc-900 border border-zinc-700/80 rounded-full px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-colors">
+                    <button onclick="sendMessage()" class="px-6 py-3.5 rounded-full text-white font-semibold gradient-btn flex items-center gap-2 shadow-lg shadow-purple-600/20">
+                        <span>Gönder</span> <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-xs text-zinc-500 mt-2.5 text-center">Mesaj gönderebilmek için hesabınızla giriş yapmış olmanız gerekmektedir.</p>
+        </div>
+
+        <!-- 3. TARTIŞMA & ÖNERİLER -->
+        <div id="tartisma" class="page">
+            <div class="mb-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> Tartışma & Öneriler
+                </h2>
+                <p class="text-zinc-400 text-sm mt-1">Platformun gelişimine katkıda bulunun, en çok merak edilen konuları inceleyin ve önerilerinizi paylaşın.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Top Discussions Sidebar -->
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 flex flex-col">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-purple-400"></i> Gündemdeki Konular
+                    </h3>
+                    <ul class="flex flex-col gap-3">
+                        <li class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm text-zinc-300 hover:border-purple-500/40 transition-all cursor-pointer">
+                            <span class="text-purple-400 font-semibold block mb-1">Moderasyon & Haksız Banlar</span>
+                            <span class="text-xs text-zinc-500">Platform içi yapay zeka ve insan mod dengesi.</span>
+                        </li>
+                        <li class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm text-zinc-300 hover:border-purple-500/40 transition-all cursor-pointer">
+                            <span class="text-blue-400 font-semibold block mb-1">İçerik Üretici Ödemeleri</span>
+                            <span class="text-xs text-zinc-500">Çekim süreleri, komisyon oranları ve alternatifler.</span>
+                        </li>
+                        <li class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm text-zinc-300 hover:border-purple-500/40 transition-all cursor-pointer">
+                            <span class="text-emerald-400 font-semibold block mb-1">Chat Spam & Bot Problemi</span>
+                            <span class="text-xs text-zinc-500">Takipçi botları ve izlenme hilelerine karşı çözümler.</span>
+                        </li>
+                        <li class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm text-zinc-300 hover:border-purple-500/40 transition-all cursor-pointer">
+                            <span class="text-amber-400 font-semibold block mb-1">Mobil Uygulama Eksikleri</span>
+                            <span class="text-xs text-zinc-500">Mobil tarayıcı deneyimi ve bildirim geliştirmeleri.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Suggestion Submission & Community Feed -->
+                <div class="lg:col-span-2 flex flex-col gap-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800">
+                        <h3 class="text-lg font-bold text-white mb-3">Fikrini veya Önerini Paylaş</h3>
+                        <p class="text-zinc-400 text-sm mb-4">Gönderdiğiniz tüm öneriler doğrudan Firestore veritabanına kaydedilir ve admin ekibimiz tarafından değerlendirilir.</p>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Konu Başlığı</label>
+                                <input type="text" id="oneriBaslik" placeholder="Örn: Yeni kategori filtresi eklensin"
+                                    class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Öneri Detayı</label>
+                                <textarea id="oneriIcerik" placeholder="Detaylı açıklamalarınızı buraya yazın..." rows="4"
+                                    class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 resize-none"></textarea>
+                            </div>
+                            <button onclick="gonderOneri()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20">
+                                Öneriyi Veritabanına Gönder
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Community Suggestions Feed -->
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center justify-between">
+                            <span>Topluluk Öneri Akışı</span>
+                            <span class="text-xs font-normal text-zinc-500" id="oneriCount">Yükleniyor...</span>
+                        </h3>
+                        <div id="oneriListesi" class="space-y-3.5">
+                            <div class="text-zinc-500 text-sm py-4 text-center">Öneriler yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. DESTEK OLAN YAYINCILAR -->
+        <div id="yayincilar" class="page">
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-heart text-red-400"></i> Destek Olan Yayıncılar
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-1">StreamForge topluluğuna katılan ve başvurusu onaylanan değerli içerik üreticileri.</p>
+                </div>
+                <button onclick="showPage('basvuru')" class="px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-purple-400"></i> Yayıncı Olmak İstiyorum
+                </button>
+            </div>
+
+            <!-- Streamer Grid -->
+            <div id="streamerList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                <div class="col-span-full py-12 text-center text-zinc-500">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>Yayıncılar yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. YAYINCI BAŞVURUSU -->
+        <div id="basvuru" class="page">
+            <div class="max-w-xl mx-auto">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-file-pen text-blue-400"></i> Yayıncı Başvurusu
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-1">Kanalınızı topluluğumuzun vitrinine eklemek ve destek ağına dahil olmak için başvurun.</p>
+                </div>
+
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800 shadow-xl">
+                    <div class="text-lg font-bold text-purple-300 mb-6 pb-4 border-b border-zinc-800 flex items-center gap-2">
+                        <i class="fa-solid fa-handshake"></i> Selamlar, Yayıncı Adayı!
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Adınız</label>
+                            <input type="text" id="basvuruIsim" placeholder="Örn: Ahmet"
+                                class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Soyadınız</label>
+                            <input type="text" id="basvuruSoyad" placeholder="Örn: Yılmaz"
+                                class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Kanal Linkiniz (Kick / Twitch / YouTube)</label>
+                            <input type="url" id="basvuruKanal" placeholder="https://kick.com/kanaladi"
+                                class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="gonderBasvuru()" class="w-full py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> Başvuruyu Veritabanına Gönder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 7/24 DESTEK -->
+        <div id="destek" class="page">
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-headset text-emerald-400"></i> 7/24 Destek Merkezi
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-1">Haksız ban, ödeme gecikmesi, teknik aksaklık veya hesap sorunları için destek bileti oluşturun.</p>
+                </div>
+
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800 shadow-xl">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Destek Konusu / Kategori</label>
+                            <select id="destekKategori" class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500">
+                                <option value="Haksız Ban / Moderasyon">Haksız Ban / Moderasyon Sorunu</option>
+                                <option value="Ödeme / Gelir Problemi">Ödeme / Gelir Problemi</option>
+                                <option value="Teknik / Hesap Sorunu">Teknik veya Hesap Sorunu</option>
+                                <option value="Diğer">Diğer Konular</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Sorununuzun Detayları</label>
+                            <textarea id="destekMesaj" placeholder="Yaşadığınız sorunu detaylıca açıklayın, kanal linkinizi ekleyin..." rows="5"
+                                class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 resize-none"></textarea>
+                        </div>
+                        <button onclick="gonderDestek()" class="w-full py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-ticket"></i> Destek Talebi Oluştur
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Tickets History Preview -->
+                <div class="mt-8 glass-panel p-6 rounded-2xl border border-zinc-800">
+                    <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-purple-400"></i> Son Destek Taleplerim
+                    </h3>
+                    <div id="userTicketList" class="space-y-3">
+                        <p class="text-xs text-zinc-500 text-center py-3">Giriş yaptıktan sonra talepleriniz listelenir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. ADMIN PANEL -->
+        <div id="admin" class="page">
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-shield-halved text-purple-400"></i> Admin Yönetim Paneli
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-1">Yayıncı başvurularını, kullanıcı önerilerini ve destek biletlerini yönetin.</p>
+                </div>
+                <div id="adminBadge" class="hidden px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i> Yetkili Oturumu Açık
+                    <button onclick="adminLogout()" class="ml-2 text-zinc-400 hover:text-white underline text-xs">Çıkış</button>
+                </div>
+            </div>
+
+            <!-- Admin Login Box -->
+            <div id="adminLoginBox" class="max-w-md mx-auto my-12">
+                <div class="glass-panel p-8 rounded-2xl border border-zinc-800 text-center shadow-2xl">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-4 text-purple-400 text-2xl">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Yönetici Doğrulaması</h3>
+                    <p class="text-zinc-400 text-sm mb-6">Panoya erişmek için lütfen admin şifresini girin.</p>
+                    <input type="password" id="adminSifre" placeholder="Admin Şifresi"
+                        class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3.5 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:border-purple-500 mb-4 tracking-widest">
+                    <button onclick="adminGiris()" class="w-full py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20">
+                        Admin Paneline Giriş Yap
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Tabs & Content Container -->
+            <div id="adminPanelContent" class="hidden space-y-6">
+                <!-- Admin Navigation Tabs -->
+                <div class="flex flex-wrap gap-2 bg-zinc-900/60 p-1.5 rounded-2xl border border-zinc-800">
+                    <button onclick="switchAdminTab('basvurular')" id="tabBtn-basvurular" class="admin-tab flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all bg-purple-600 text-white shadow-lg shadow-purple-600/20">
+                        <i class="fa-solid fa-users-viewfinder mr-2"></i> Yayıncı Başvuruları
+                    </button>
+                    <button onclick="switchAdminTab('oneriler')" id="tabBtn-oneriler" class="admin-tab flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
+                        <i class="fa-solid fa-lightbulb mr-2"></i> Öneriler & Fikirler
+                    </button>
+                    <button onclick="switchAdminTab('destekler')" id="tabBtn-destekler" class="admin-tab flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
+                        <i class="fa-solid fa-headset mr-2"></i> Destek Talepleri
+                    </button>
+                </div>
+
+                <!-- Tab 1: Pending Streamer Applications -->
+                <div id="adminTab-basvurular" class="admin-section space-y-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-white">Bekleyen Yayıncı Başvuruları</h3>
+                        <button onclick="yukleAdminBasvurular()" class="text-xs text-purple-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
+                    </div>
+                    <div id="adminPendingList" class="space-y-3">
+                        <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: User Suggestions -->
+                <div id="adminTab-oneriler" class="admin-section space-y-4 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-white">Gönderilen Öneriler & Geri Bildirimler</h3>
+                        <button onclick="yukleAdminOneriler()" class="text-xs text-purple-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
+                    </div>
+                    <div id="adminOneriList" class="space-y-3">
+                        <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Support Tickets -->
+                <div id="adminTab-destekler" class="admin-section space-y-4 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-white">Açık Destek Talepleri & Şikayetler</h3>
+                        <button onclick="yukleAdminDestekler()" class="text-xs text-purple-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
+                    </div>
+                    <div id="adminDestekList" class="space-y-3">
+                        <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-panel p-8 rounded-3xl border border-zinc-800 w-full max-w-md relative shadow-2xl animate-in fade-in zoom-in duration-200">
+            <button onclick="closeAuthModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="authModalTitle" class="text-2xl font-extrabold text-white mb-2">Giriş Yap</div>
+            <p id="authModalDesc" class="text-zinc-400 text-sm mb-6">Topluluk hesabınıza erişin veya yeni hesap oluşturun.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Kullanıcı Adı / E-posta</label>
+                    <input type="text" id="authEmail" placeholder="Kullanıcı adınız"
+                        class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Şifre</label>
+                    <input type="password" id="authPassword" placeholder="••••••••"
+                        class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500">
+                </div>
+                <button id="authActionBtn" onclick="handleAuthSubmit()" class="w-full py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20 mt-2">
+                    Giriş Yap
+                </button>
+                <div class="text-center pt-2">
+                    <span id="authSwitchText" class="text-sm text-zinc-400">Hesabınız yok mu?</span>
+                    <button onclick="toggleAuthMode()" id="authSwitchBtn" class="text-sm font-semibold text-purple-400 hover:underline ml-1">Kayıt Ol</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="glass-header py-8 mt-16 text-center text-zinc-500 text-sm border-t border-zinc-800/80">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-white text-xs"></i>
+                </div>
+                <span class="font-bold text-zinc-300">StreamForge Ultimate</span>
+            </div>
+            <p>© 2026 İçerik Üreticileri Topluluk Platformu. Tüm hakları saklıdır.</p>
+            <div class="flex items-center gap-4 text-xs text-zinc-400">
+                <span class="hover:text-white cursor-pointer" onclick="showPage('chat')">Global Sohbet</span>
+                <span class="hover:text-white cursor-pointer" onclick="showPage('yayincilar')">Yayıncılar</span>
+                <span class="hover:text-white cursor-pointer" onclick="showPage('destek')">Destek</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUtHW0VnS4fe12kuO5cM2E4f2LSvZE-1o",
+            authDomain: "streamforge-1381b.firebaseapp.com",
+            projectId: "streamforge-1381b",
+            storageBucket: "streamforge-1381b.firebasestorage.app",
+            messagingSenderId: "168312100746",
+            appId: "1:168312100746:web:33daab98e3e26a04c71a73",
+            measurementId: "G-WSR2W0N6LJ"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // State variables
+        let currentUser = localStorage.getItem('sf_user') || null;
+        let isAdminLoggedIn = localStorage.getItem('sf_admin') === 'true';
+        let authMode = 'login'; // 'login' or 'register'
+        let chatRealtimeUnsubscribe = null;
+
+        // Initialize UI on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserUI();
+            yukleYayincilar();
+            yukleOneriler();
+            if (isAdminLoggedIn) {
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminPanelContent').classList.remove('hidden');
+                document.getElementById('adminBadge').classList.remove('hidden');
+            }
+        });
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200' : 'bg-red-950/90 border-red-500/50 text-red-200';
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-red-400';
+            
+            toast.className = `glass-panel px-5 py-4 rounded-2xl border ${bgColor} shadow-2xl flex items-center gap-3 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-auto max-w-sm`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span class="text-sm font-medium flex-1">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Navigation Controller
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update tab styles
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                if (btn.getAttribute('data-target') === pageId) {
+                    btn.classList.add('bg-zinc-800', 'text-white');
+                    btn.classList.remove('text-zinc-300');
+                } else {
+                    btn.classList.remove('bg-zinc-800', 'text-white');
+                    btn.classList.add('text-zinc-300');
+                }
+            });
+
+            // Page specific loaders
+            if (pageId === 'chat') startChatRealtime();
+            if (pageId === 'yayincilar') yukleYayincilar();
+            if (pageId === 'tartisma') yukleOneriler();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const authAreaMob = document.getElementById('mobileAuthArea');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+                if (currentUser) {
+                    authAreaMob.innerHTML = `
+                        <div class="flex items-center justify-between p-3 bg-zinc-900 rounded-xl">
+                            <span class="font-bold text-amber-400 text-sm"><i class="fa-solid fa-user mr-2"></i>${currentUser}</span>
+                            <button onclick="logout(); toggleMobileMenu();" class="px-4 py-2 rounded-lg bg-red-600/20 text-red-400 text-xs font-semibold">Çıkış Yap</button>
+                        </div>`;
+                } else {
+                    authAreaMob.innerHTML = `
+                        <button onclick="openAuthModal('login'); toggleMobileMenu();" class="w-full py-3 rounded-xl bg-zinc-800 text-white font-semibold text-sm">Giriş Yap</button>
+                        <button onclick="openAuthModal('register'); toggleMobileMenu();" class="w-full py-3 rounded-xl gradient-btn text-white font-semibold text-sm">Kayıt Ol</button>`;
+                }
+            } else {
+                menu.classList.remove('flex');
+                menu.classList.add('hidden');
+            }
+        }
+
+        // Authentication Handlers
+        function openAuthModal(mode) {
+            authMode = mode;
+            const modal = document.getElementById('authModal');
+            const title = document.getElementById('authModalTitle');
+            const desc = document.getElementById('authModalDesc');
+            const btn = document.getElementById('authActionBtn');
+            const switchText = document.getElementById('authSwitchText');
+            const switchBtn = document.getElementById('authSwitchBtn');
+
+            if (mode === 'login') {
+                title.textContent = 'Hesabınıza Giriş Yapın';
+                desc.textContent = 'Topluluk sohbetlerine ve destek taleplerine erişin.';
+                btn.textContent = 'Giriş Yap';
+                switchText.textContent = 'Hesabınız yok mu?';
+                switchBtn.textContent = 'Kayıt Ol';
+            } else {
+                title.textContent = 'Yeni Hesap Oluştur';
+                desc.textContent = 'StreamForge topluluğuna katılmak için hemen kayıt olun.';
+                btn.textContent = 'Kayıt Ol ve Giriş Yap';
+                switchText.textContent = 'Zaten hesabınız var mı?';
+                switchBtn.textContent = 'Giriş Yap';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPassword').value = '';
+        }
+
+        function toggleAuthMode() {
+            openAuthModal(authMode === 'login' ? 'register' : 'login');
+        }
+
+        function handleAuthSubmit() {
+            const username = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!username || !password) {
+                showToast('Lütfen tüm alanları doldurun!', 'error');
+                return;
+            }
+
+            if (authMode === 'register') {
+                // Register logic (stores in localStorage & Firestore users collection if wanted)
+                currentUser = username;
+                localStorage.setItem('sf_user', username);
+                db.collection('users').add({
+                    username: username,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(() => {});
+                showToast(`Başarıyla kayıt olundu, hoş geldin ${username}!`, 'success');
+            } else {
+                currentUser = username;
+                localStorage.setItem('sf_user', username);
+                showToast(`Hoş geldin, ${username}!`, 'success');
+            }
+
+            updateUserUI();
+            closeAuthModal();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('sf_user');
+            updateUserUI();
+            showToast('Hesaptan çıkış yapıldı.', 'success');
+        }
+
+        function updateUserUI() {
+            const area = document.getElementById('userArea');
+            if (currentUser) {
+                area.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-amber-400 font-bold text-sm hidden sm:inline-block"><i class="fa-solid fa-user-circle mr-1.5"></i>${currentUser}</span>
+                        <button onclick="logout()" class="px-4 py-2 rounded-full text-xs font-semibold text-zinc-300 bg-zinc-800 hover:bg-zinc-700 transition-all border border-zinc-700">Çıkış</button>
+                    </div>`;
+            } else {
+                area.innerHTML = `
+                    <button onclick="openAuthModal('login')" class="px-5 py-2 rounded-full text-sm font-semibold text-white border border-zinc-700 hover:border-purple-500 hover:bg-purple-500/10 transition-all">Giriş Yap</button>
+                    <button onclick="openAuthModal('register')" class="hidden sm:inline-block px-5 py-2 rounded-full text-sm font-semibold text-white gradient-btn shadow-lg shadow-purple-600/20">Kayıt Ol</button>`;
+            }
+        }
+
+        // Realtime Global Chat
+        function startChatRealtime() {
+            const box = document.getElementById('chat-box');
+            if (chatRealtimeUnsubscribe) return; // already listening
+
+            chatRealtimeUnsubscribe = db.collection('mesajlar').orderBy('tarih').limitToLast(60)
+                .onSnapshot(snap => {
+                    box.innerHTML = '';
+                    if (snap.empty) {
+                        box.innerHTML = '<div class="text-center text-zinc-500 py-8">Henüz mesaj yazılmamış. İlk mesajı sen gönder!</div>';
+                        return;
+                    }
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const isMe = d.user === currentUser;
+                        const timeStr = d.tarih && d.tarih.toDate ? new Date(d.tarih.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Az önce';
+                        
+                        box.innerHTML += `
+                            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3">
+                                <span class="text-[11px] text-zinc-500 mb-1 px-1">${d.user} • ${timeStr}</span>
+                                <div class="max-w-[85% ] sm:max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-purple-600 text-white rounded-tr-none shadow-lg shadow-purple-600/20' : 'glass-panel text-zinc-200 rounded-tl-none border border-zinc-800'}">
+                                    ${escapeHtml(d.text)}
+                                </div>
+                            </div>`;
+                    });
+                    box.scrollTop = box.scrollHeight;
+                }, err => {
+                    box.innerHTML = '<div class="text-center text-red-400 py-8">Sohbet yüklenirken hata oluştu.</div>';
+                });
+        }
+
+        function sendMessage() {
+            if (!currentUser) {
+                showToast('Mesaj göndermek için giriş yapmalısınız!', 'error');
+                openAuthModal('login');
+                return;
+            }
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            db.collection('mesajlar').add({
+                user: currentUser,
+                text: text,
+                tarih: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                input.value = '';
+            }).catch(err => {
+                showToast('Mesaj gönderilemedi.', 'error');
+            });
+        }
+
+        document.getElementById('msgInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Suggestions & Discussions Management
+        function gonderOneri() {
+            if (!currentUser) {
+                showToast('Öneri göndermek için giriş yapmalısınız!', 'error');
+                openAuthModal('login');
+                return;
+            }
+            const baslik = document.getElementById('oneriBaslik').value.trim();
+            const icerik = document.getElementById('oneriIcerik').value.trim();
+            if (!baslik || !icerik) {
+                showToast('Lütfen başlık ve içerik alanlarını doldurun!', 'error');
+                return;
+            }
+
+            db.collection('oneriler').add({
+                user: currentUser,
+                baslik: baslik,
+                icerik: icerik,
+                status: 'pending',
+                tarih: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('oneriBaslik').value = '';
+                document.getElementById('oneriIcerik').value = '';
+                showToast('Öneriniz başarıyla veritabanına kaydedildi!', 'success');
+                yukleOneriler();
+            }).catch(() => {
+                showToast('Öneri gönderilemedi.', 'error');
+            });
+        }
+
+        function yukleOneriler() {
+            const list = document.getElementById('oneriListesi');
+            const countEl = document.getElementById('oneriCount');
+            if (!list) return;
+
+            db.collection('oneriler').orderBy('tarih', 'desc').limit(15).get()
+                .then(snap => {
+                    if (snap.empty) {
+                        list.innerHTML = '<div class="text-zinc-500 text-sm py-4 text-center">Henüz öneri paylaşılmamış.</div>';
+                        if (countEl) countEl.textContent = '0 öneri';
+                        return;
+                    }
+                    if (countEl) countEl.textContent = `${snap.size} öneri`;
+                    list.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        list.innerHTML += `
+                            <div class="p-4 rounded-xl bg-zinc-900/70 border border-zinc-800/80 hover:border-purple-500/40 transition-all">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-white text-sm">${escapeHtml(d.baslik)}</h4>
+                                    <span class="text-xs text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full">${escapeHtml(d.user)}</span>
+                                </div>
+                                <p class="text-zinc-300 text-sm leading-relaxed">${escapeHtml(d.icerik)}</p>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    list.innerHTML = '<div class="text-zinc-500 text-sm py-4 text-center">Öneriler yüklenemedi.</div>';
+                });
+        }
+
+        // Streamers Network
+        function yukleYayincilar() {
+            const liste = document.getElementById('streamerList');
+            if (!liste) return;
+
+            db.collection('basvurular').where('status', '==', 'accepted').get()
+                .then(snap => {
+                    if (snap.empty) {
+                        liste.innerHTML = `
+                            <div class="col-span-full py-12 text-center text-zinc-500 glass-panel rounded-2xl border border-zinc-800">
+                                <i class="fa-solid fa-users-slash text-3xl mb-3 text-zinc-600"></i>
+                                <p class="text-sm">Henüz onaylanmış yayıncı bulunmuyor.</p>
+                            </div>`;
+                        return;
+                    }
+                    liste.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const initial = (d.isim || '?').charAt(0).toUpperCase();
+                        liste.innerHTML += `
+                            <div class="glass-panel p-6 rounded-2xl border border-zinc-800 text-center hover:border-purple-500/50 hover:scale-[1.02] transition-all group shadow-xl">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg shadow-purple-600/30 group-hover:rotate-3 transition-transform">
+                                    ${initial}
+                                </div>
+                                <h3 class="font-bold text-white text-base mb-1">${escapeHtml(d.isim)} ${escapeHtml(d.soyad || '')}</h3>
+                                <div class="mb-4">
+                                    <a href="${escapeHtml(d.kanal)}" target="_blank" class="text-xs text-purple-400 hover:underline flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-square-arrow-up-right"></i> Kanalı Ziyaret Et
+                                    </a>
+                                </div>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+                                    <i class="fa-solid fa-circle-check text-[10px]"></i> Onaylı Yayıncı
+                                </span>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    liste.innerHTML = '<div class="col-span-full text-center text-red-400 py-8">Yayıncılar yüklenirken hata oluştu.</div>';
+                });
+        }
+
+        // Streamer Application
+        function gonderBasvuru() {
+            if (!currentUser) {
+                showToast('Yayıncı başvurusu yapmak için giriş yapmalısınız!', 'error');
+                openAuthModal('login');
+                return;
+            }
+            const isim = document.getElementById('basvuruIsim').value.trim();
+            const soyad = document.getElementById('basvuruSoyad').value.trim();
+            const kanal = document.getElementById('basvuruKanal').value.trim();
+
+            if (!isim || !soyad || !kanal) {
+                showToast('Lütfen tüm başvuru alanlarını doldurun!', 'error');
+                return;
+            }
+
+            db.collection('basvurular').add({
+                user: currentUser,
+                isim: isim,
+                soyad: soyad,
+                kanal: kanal,
+                status: 'pending',
+                tarih: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('basvuruIsim').value = '';
+                document.getElementById('basvuruSoyad').value = '';
+                document.getElementById('basvuruKanal').value = '';
+                showToast('Yayıncı başvurunuz başarıyla gönderildi!', 'success');
+            }).catch(() => {
+                showToast('Başvuru gönderilemedi.', 'error');
+            });
+        }
+
+        // 7/24 Support Tickets
+        function gonderDestek() {
+            if (!currentUser) {
+                showToast('Destek talebi oluşturmak için giriş yapmalısınız!', 'error');
+                openAuthModal('login');
+                return;
+            }
+            const kategori = document.getElementById('destekKategori').value;
+            const mesaj = document.getElementById('destekMesaj').value.trim();
+
+            if (!mesaj) {
+                showToast('Lütfen sorun detaylarını yazın!', 'error');
+                return;
+            }
+
+            db.collection('destekler').add({
+                user: currentUser,
+                kategori: kategori,
+                mesaj: mesaj,
+                status: 'Açık',
+                tarih: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('destekMesaj').value = '';
+                showToast('Destek talebiniz başarıyla oluşturuldu!', 'success');
+                yukleKullaniciDestekler();
+            }).catch(() => {
+                showToast('Destek talebi gönderilemedi.', 'error');
+            });
+        }
+
+        function yukleKullaniciDestekler() {
+            const list = document.getElementById('userTicketList');
+            if (!list || !currentUser) return;
+
+            db.collection('destekler').where('user', '==', currentUser).get()
+                .then(snap => {
+                    if (snap.empty) {
+                        list.innerHTML = '<p class="text-xs text-zinc-500 text-center py-2">Aktif destek talebiniz bulunmuyor.</p>';
+                        return;
+                    }
+                    list.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        list.innerHTML += `
+                            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm flex justify-between items-center">
+                                <div>
+                                    <span class="text-purple-400 font-semibold block text-xs mb-1">${escapeHtml(d.kategori)}</span>
+                                    <p class="text-zinc-300 text-xs">${escapeHtml(d.mesaj.substring(0, 50))}...</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">${d.status}</span>
+                            </div>`;
+                    });
+                }).catch(() => {});
+        }
+
+        // Admin Panel Management
+        function adminGiris() {
+            const sifre = document.getElementById('adminSifre').value;
+            if (sifre === '102382') {
+                isAdminLoggedIn = true;
+                localStorage.setItem('sf_admin', 'true');
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminPanelContent').classList.remove('hidden');
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('adminSifre').value = '';
+                showToast('Admin girişi başarılı!', 'success');
+                switchAdminTab('basvurular');
+            } else {
+                showToast('Hatalı admin şifresi!', 'error');
+            }
+        }
+
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            localStorage.removeItem('sf_admin');
+            document.getElementById('adminLoginBox').classList.remove('hidden');
+            document.getElementById('adminPanelContent').classList.add('hidden');
+            document.getElementById('adminBadge').classList.add('hidden');
+            showToast('Admin oturumu kapatıldı.', 'success');
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-lg', 'shadow-purple-600/20');
+                btn.classList.add('text-zinc-400');
+            });
+            document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));
+
+            const activeBtn = document.getElementById(`tabBtn-${tabName}`);
+            const activeSec = document.getElementById(`adminTab-${tabName}`);
+
+            if (activeBtn) {
+                activeBtn.classList.add('bg-purple-600', 'text-white', 'shadow-lg', 'shadow-purple-600/20');
+                activeBtn.classList.remove('text-zinc-400');
+            }
+            if (activeSec) {
+                activeSec.classList.remove('hidden');
+            }
+
+            if (tabName === 'basvurular') yukleAdminBasvurular();
+            if (tabName === 'oneriler') yukleAdminOneriler();
+            if (tabName === 'destekler') yukleAdminDestekler();
+        }
+
+        // Admin: Streamer Applications
+        function yukleAdminBasvurular() {
+            const liste = document.getElementById('adminPendingList');
+            if (!liste) return;
+            liste.innerHTML = '<div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>';
+
+            db.collection('basvurular').where('status', '==', 'pending').get()
+                .then(snap => {
+                    if (snap.empty) {
+                        liste.innerHTML = '<div class="glass-panel p-6 rounded-xl text-center text-zinc-500 text-sm">Bekleyen yayıncı başvurusu bulunmuyor.</div>';
+                        return;
+                    }
+                    liste.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        liste.innerHTML += `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <h4 class="font-bold text-white text-base">${escapeHtml(d.isim)} ${escapeHtml(d.soyad || '')}</h4>
+                                    <a href="${escapeHtml(d.kanal)}" target="_blank" class="text-xs text-purple-400 hover:underline mt-1 block">${escapeHtml(d.kanal)}</a>
+                                    <span class="text-[11px] text-zinc-500 mt-1 block">Gönderen: ${escapeHtml(d.user || 'Bilinmiyor')}</span>
+                                </div>
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <button onclick="adminKabulBasvuru('${doc.id}')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20">Kabul Et</button>
+                                    <button onclick="adminSilDokuman('basvurular', '${doc.id}', yukleAdminBasvurular)" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-400 text-xs font-semibold border border-red-500/30">Reddet / Sil</button>
+                                </div>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    liste.innerHTML = '<div class="text-red-400 text-sm py-6 text-center">Başvurular yüklenirken hata oluştu.</div>';
+                });
+        }
+
+        function adminKabulBasvuru(id) {
+            db.collection('basvurular').doc(id).update({ status: 'accepted' })
+                .then(() => {
+                    showToast('Yayıncı başvurusu onaylandı!', 'success');
+                    yukleAdminBasvurular();
+                    yukleYayincilar();
+                }).catch(() => showToast('İşlem başarısız.', 'error'));
+        }
+
+        // Admin: Suggestions
+        function yukleAdminOneriler() {
+            const liste = document.getElementById('adminOneriList');
+            if (!liste) return;
+            liste.innerHTML = '<div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>';
+
+            db.collection('oneriler').orderBy('tarih', 'desc').get()
+                .then(snap => {
+                    if (snap.empty) {
+                        liste.innerHTML = '<div class="glass-panel p-6 rounded-xl text-center text-zinc-500 text-sm">Kayıtlı öneri bulunmuyor.</div>';
+                        return;
+                    }
+                    liste.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        liste.innerHTML += `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="font-bold text-white text-sm">${escapeHtml(d.baslik)}</h4>
+                                        <span class="text-[10px] text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full">${escapeHtml(d.user)}</span>
+                                    </div>
+                                    <p class="text-zinc-300 text-xs leading-relaxed">${escapeHtml(d.icerik)}</p>
+                                </div>
+                                <button onclick="adminSilDokuman('oneriler', '${doc.id}', yukleAdminOneriler)" class="px-4 py-2 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-400 text-xs font-semibold border border-red-500/30">Sil</button>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    liste.innerHTML = '<div class="text-red-400 text-sm py-6 text-center">Öneriler yüklenemedi.</div>';
+                });
+        }
+
+        // Admin: Support Tickets
+        function yukleAdminDestekler() {
+            const liste = document.getElementById('adminDestekList');
+            if (!liste) return;
+            liste.innerHTML = '<div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>';
+
+            db.collection('destekler').orderBy('tarih', 'desc').get()
+                .then(snap => {
+                    if (snap.empty) {
+                        liste.innerHTML = '<div class="glass-panel p-6 rounded-xl text-center text-zinc-500 text-sm">Aktif destek talebi bulunmuyor.</div>';
+                        return;
+                    }
+                    liste.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        liste.innerHTML += `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">${escapeHtml(d.kategori)}</span>
+                                        <span class="text-xs text-zinc-400">Kullanıcı: ${escapeHtml(d.user)}</span>
+                                    </div>
+                                    <p class="text-zinc-300 text-xs leading-relaxed mt-1.5">${escapeHtml(d.mesaj)}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="adminKapatDestek('${doc.id}')" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 text-emerald-400 text-xs font-semibold border border-emerald-500/30">Çözüldü / Kapat</button>
+                                    <button onclick="adminSilDokuman('destekler', '${doc.id}', yukleAdminDestekler)" class="px-3.5 py-2 rounded-xl bg-red-600/20 text-red-400 text-xs font-semibold border border-red-500/30">Sil</button>
+                                </div>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    liste.innerHTML = '<div class="text-red-400 text-sm py-6 text-center">Destek talepleri yüklenemedi.</div>';
+                });
+        }
+
+        function adminKapatDestek(id) {
+            db.collection('destekler').doc(id).update({ status: 'Çözüldü' })
+                .then(() => {
+                    showToast('Destek talebi kapatıldı.', 'success');
+                    yukleAdminDestekler();
+                }).catch(() => showToast('İşlem başarısız.', 'error'));
+        }
+
+        function adminSilDokuman(collectionName, id, callback) {
+            db.collection(collectionName).doc(id).delete()
+                .then(() => {
+                    showToast('Kayıt başarıyla silindi.', 'success');
+                    if (callback) callback();
+                }).catch(() => showToast('Silme işlemi başarısız.', 'error'));
+        }
+    </script>
+</body>
+</html>
