@@ -32,6 +32,9 @@
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 6s ease-in-out infinite',
                         'glow': 'glow 3s ease-in-out infinite alternate',
+                        'fade-in-up': 'fadeInUp 0.7s ease-out forwards',
+                        'scale-in': 'scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-down': 'slideDown 0.5s ease-out forwards',
                     },
                     keyframes: {
                         float: {
@@ -41,6 +44,18 @@
                         glow: {
                             '0%': { opacity: 0.4 },
                             '100%': { opacity: 0.8 },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(24px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.92)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-16px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     }
                 }
@@ -150,9 +165,70 @@
             background: #fff;
             animation: pulse 1.4s ease-in-out infinite;
         }
+        /* Logo glow */
+        .logo-glow {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.45), 0 0 40px rgba(59, 130, 246, 0.25);
+        }
+        /* Auth modal entrance */
+        #authModal .auth-card {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #authModal.flex .auth-card {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        /* Page load splash */
+        #pageLoader {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #09090b;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        #pageLoader.hidden-loader {
+            opacity: 0; visibility: hidden; pointer-events: none;
+        }
+        .loader-logo {
+            animation: float 2.5s ease-in-out infinite;
+        }
+        /* Admin stat cards */
+        .admin-stat {
+            background: linear-gradient(145deg, rgba(24,24,30,0.9), rgba(18,18,22,0.95));
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.25s ease;
+        }
+        .admin-stat:hover {
+            border-color: rgba(139, 92, 246, 0.35);
+            transform: translateY(-2px);
+        }
+        /* Hero image overlay */
+        .hero-bg {
+            background-image: linear-gradient(to bottom, rgba(9,9,11,0.55), rgba(9,9,11,0.92)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 1.5rem;
+        }
+        .feature-img {
+            background-size: cover;
+            background-position: center;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+
+    <!-- Page Load Animation -->
+    <div id="pageLoader">
+        <div class="loader-logo w-20 h-20 rounded-2xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center logo-glow mb-5">
+            <i class="fa-solid fa-bolt text-white text-3xl"></i>
+        </div>
+        <div class="text-xl font-extrabold text-white tracking-tight">Stream<span class="text-amber-400">Pulse</span></div>
+        <div class="mt-4 flex gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-purple-500 animate-bounce" style="animation-delay:0s"></span>
+            <span class="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style="animation-delay:0.15s"></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style="animation-delay:0.3s"></span>
+        </div>
+    </div>
 
     <div class="glow-sphere-1"></div>
     <div class="glow-sphere-2"></div>
@@ -162,7 +238,7 @@
 
     <header class="glass-header sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between transition-all">
         <div class="flex items-center gap-3 cursor-pointer group" onclick="showPage('home')">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/25 logo-glow group-hover:scale-110 transition-transform">
                 <i class="fa-solid fa-bolt text-white text-lg"></i>
             </div>
             <span class="text-xl font-extrabold tracking-tight text-white">Stream<span class="text-amber-400">Pulse</span></span>
@@ -198,7 +274,7 @@
     <div id="mobileMenu" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex-col p-6 justify-between lg:hidden transition-all">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center logo-glow">
                     <i class="fa-solid fa-bolt text-white"></i>
                 </div>
                 <span class="text-lg font-extrabold text-white">Stream<span class="text-amber-400">Pulse</span></span>
@@ -221,49 +297,74 @@
 
         <!-- 1. ANA SAYFA -->
         <div id="home" class="page active">
-            <div class="relative py-12 md:py-20 text-center flex flex-col items-center">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs sm:text-sm font-semibold mb-6 animate-bounce">
+            <!-- Hero with photo background -->
+            <div class="hero-bg relative py-16 md:py-24 px-6 text-center flex flex-col items-center mb-10 overflow-hidden">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur border border-purple-500/30 text-purple-200 text-xs sm:text-sm font-semibold mb-6 animate-bounce">
                     <i class="fa-solid fa-fire text-amber-400"></i> Kick & Canlı Yayın Ekosistemi Topluluk Gücü
                 </div>
-                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mb-6 leading-tight">
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mb-6 leading-tight drop-shadow-lg">
                     Streaming Dünyasını Birlikte <span class="gradient-text">İyileştiriyoruz</span>
                 </h1>
-                <p class="text-zinc-400 text-base sm:text-lg max-w-2xl mb-10 leading-relaxed">
+                <p class="text-zinc-200 text-base sm:text-lg max-w-2xl mb-10 leading-relaxed drop-shadow">
                     Kick ve diğer platformlardaki moderasyon sıkıntılarını, ödeme sorunlarını konuşuyor, ortak çözümler üretiyor ve içerik üreticilerine 7/24 kesintisiz destek sağlıyoruz.
                 </p>
                 <div class="flex flex-wrap items-center justify-center gap-4">
-                    <button onclick="showPage('chat')" class="px-8 py-4 rounded-full text-white font-semibold gradient-btn shadow-xl shadow-purple-600/25 flex items-center gap-3 group">
+                    <button onclick="showPage('chat')" class="px-8 py-4 rounded-full text-white font-semibold gradient-btn shadow-xl shadow-purple-600/40 flex items-center gap-3 group">
                         <i class="fa-solid fa-comments text-lg"></i> Sohbete Hemen Katıl
                         <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </button>
-                    <button onclick="showPage('yayincilar')" class="px-8 py-4 rounded-full text-white font-semibold glass-panel hover:bg-zinc-800/80 transition-all flex items-center gap-2 border-zinc-700">
-                        <i class="fa-solid fa-users text-purple-400"></i> Desteklenen Yayıncılar
+                    <button onclick="showPage('yayincilar')" class="px-8 py-4 rounded-full text-white font-semibold bg-black/50 backdrop-blur hover:bg-black/70 transition-all flex items-center gap-2 border border-white/20">
+                        <i class="fa-solid fa-users text-purple-300"></i> Desteklenen Yayıncılar
                     </button>
+                </div>
+                <!-- Stats strip -->
+                <div class="mt-12 flex flex-wrap justify-center gap-6 sm:gap-10 text-center">
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-white" id="statYayinci">—</div>
+                        <div class="text-xs text-zinc-400 mt-1">Onaylı Yayıncı</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-white" id="statOneri">—</div>
+                        <div class="text-xs text-zinc-400 mt-1">Topluluk Önerisi</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400">7/24</div>
+                        <div class="text-xs text-zinc-400 mt-1">Destek Aktif</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Feature Highlights Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-purple-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-xl mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-globe"></i>
+            <!-- Feature Highlights Grid with images -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-2xl border border-zinc-800 hover:border-purple-500/50 transition-all group overflow-hidden">
+                    <div class="h-36 feature-img" style="background-image: linear-gradient(to top, rgba(18,18,22,0.95), transparent), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=70');"></div>
+                    <div class="p-6 pt-4">
+                        <div class="w-11 h-11 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-lg mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Canlı Global Sohbet</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">Topluluk üyeleriyle anlık fikir alışverişinde bulunun, sorunları ve en son yayın trendlerini tartışın.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Canlı Global Sohbet</h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed">Topluluk üyeleriyle anlık fikir alışverişinde bulunun, sorunları ve en son yayın trendlerini tartışın.</p>
                 </div>
-                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-blue-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-xl mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-shield-heart"></i>
+                <div class="glass-panel rounded-2xl border border-zinc-800 hover:border-blue-500/50 transition-all group overflow-hidden">
+                    <div class="h-36 feature-img" style="background-image: linear-gradient(to top, rgba(18,18,22,0.95), transparent), url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=70');"></div>
+                    <div class="p-6 pt-4">
+                        <div class="w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-lg mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-shield-heart"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Yayıncı Destek Ağı</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">Başvurunuz onaylandığında kanalınız vitrinde sergilenir, canlı yayınınız doğrudan izlenebilir.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Yayıncı Destek Ağı</h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed">Başvurunuz onaylandığında kanalınız binlerce kullanıcıya vitrinde sergilenir, canlı yayınınız da doğrudan izlenebilir.</p>
                 </div>
-                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-emerald-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-headset"></i>
+                <div class="glass-panel rounded-2xl border border-zinc-800 hover:border-emerald-500/50 transition-all group overflow-hidden">
+                    <div class="h-36 feature-img" style="background-image: linear-gradient(to top, rgba(18,18,22,0.95), transparent), url('https://images.unsplash.com/photo-1612287230202-1ff1d867d530?auto=format&fit=crop&w=600&q=70');"></div>
+                    <div class="p-6 pt-4">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-lg mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">7/24 Teknik Çözüm</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">Haksız ban, ödeme gecikmeleri veya teknik aksaklıklar için destek talebi açın, ekibimiz çözsün.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2">7/24 Teknik Çözüm</h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed">Haksız ban, ödeme gecikmeleri veya teknik aksaklıklar için destek talebi açın, ekibimiz inceleyip çözsün.</p>
                 </div>
             </div>
         </div>
@@ -496,32 +597,57 @@
 
             <!-- Admin Login Box -->
             <div id="adminLoginBox" class="max-w-md mx-auto my-12">
-                <div class="glass-panel p-8 rounded-2xl border border-zinc-800 text-center shadow-2xl">
-                    <div class="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-4 text-purple-400 text-2xl">
-                        <i class="fa-solid fa-lock"></i>
+                <div class="glass-panel p-8 rounded-2xl border border-purple-500/20 text-center shadow-2xl shadow-purple-900/20">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600/30 to-blue-600/20 border border-purple-500/30 flex items-center justify-center mx-auto mb-4 text-purple-300 text-2xl logo-glow">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2">Yönetici Doğrulaması</h3>
-                    <p class="text-zinc-400 text-sm mb-6">Panoya erişmek için lütfen admin şifresini girin.</p>
-                    <input type="password" id="adminSifre" placeholder="Admin Şifresi"
-                        class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3.5 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:border-purple-500 mb-4 tracking-widest">
-                    <button onclick="adminGiris()" class="w-full py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20">
-                        Admin Paneline Giriş Yap
+                    <p class="text-zinc-400 text-sm mb-6">Sadece yetkili erişebilir. Admin şifrenizi girin.</p>
+                    <input type="password" id="adminSifre" placeholder="••••••" maxlength="12"
+                        class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3.5 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:border-purple-500 mb-4 tracking-[0.35em]"
+                        onkeypress="if(event.key==='Enter')adminGiris()">
+                    <button onclick="adminGiris()" class="w-full py-3.5 rounded-xl text-white font-semibold gradient-btn shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-unlock-keyhole"></i> Admin Paneline Giriş
                     </button>
+                    <p class="text-[11px] text-zinc-600 mt-4">Şifre yanlış girilirse erişim reddedilir.</p>
                 </div>
             </div>
 
             <!-- Admin Tabs & Content Container -->
             <div id="adminPanelContent" class="hidden space-y-6">
+                <!-- Admin Stats Dashboard -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="adminStatsRow">
+                    <div class="admin-stat rounded-2xl p-4 sm:p-5">
+                        <div class="flex items-center gap-2 text-zinc-400 text-xs mb-1"><i class="fa-solid fa-clock text-amber-400"></i> Bekleyen</div>
+                        <div class="text-2xl font-extrabold text-white" id="statPending">0</div>
+                    </div>
+                    <div class="admin-stat rounded-2xl p-4 sm:p-5">
+                        <div class="flex items-center gap-2 text-zinc-400 text-xs mb-1"><i class="fa-solid fa-circle-check text-emerald-400"></i> Onaylı</div>
+                        <div class="text-2xl font-extrabold text-white" id="statAccepted">0</div>
+                    </div>
+                    <div class="admin-stat rounded-2xl p-4 sm:p-5">
+                        <div class="flex items-center gap-2 text-zinc-400 text-xs mb-1"><i class="fa-solid fa-lightbulb text-purple-400"></i> Öneri</div>
+                        <div class="text-2xl font-extrabold text-white" id="statSuggestions">0</div>
+                    </div>
+                    <div class="admin-stat rounded-2xl p-4 sm:p-5">
+                        <div class="flex items-center gap-2 text-zinc-400 text-xs mb-1"><i class="fa-solid fa-headset text-blue-400"></i> Destek</div>
+                        <div class="text-2xl font-extrabold text-white" id="statTickets">0</div>
+                    </div>
+                </div>
+
                 <!-- Admin Navigation Tabs -->
                 <div class="flex flex-wrap gap-2 bg-zinc-900/60 p-1.5 rounded-2xl border border-zinc-800">
-                    <button onclick="switchAdminTab('basvurular')" id="tabBtn-basvurular" class="admin-tab flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all bg-purple-600 text-white shadow-lg shadow-purple-600/20">
-                        <i class="fa-solid fa-users-viewfinder mr-2"></i> Yayıncı Başvuruları
+                    <button onclick="switchAdminTab('basvurular')" id="tabBtn-basvurular" class="admin-tab flex-1 min-w-[120px] py-3 px-3 rounded-xl text-sm font-semibold transition-all bg-purple-600 text-white shadow-lg shadow-purple-600/20">
+                        <i class="fa-solid fa-users-viewfinder mr-1.5"></i> Başvurular
                     </button>
-                    <button onclick="switchAdminTab('oneriler')" id="tabBtn-oneriler" class="admin-tab flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
-                        <i class="fa-solid fa-lightbulb mr-2"></i> Öneriler & Fikirler
+                    <button onclick="switchAdminTab('onaylilar')" id="tabBtn-onaylilar" class="admin-tab flex-1 min-w-[120px] py-3 px-3 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
+                        <i class="fa-solid fa-star mr-1.5"></i> Onaylı Yayıncılar
                     </button>
-                    <button onclick="switchAdminTab('destekler')" id="tabBtn-destekler" class="admin-tab flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
-                        <i class="fa-solid fa-headset mr-2"></i> Destek Talepleri
+                    <button onclick="switchAdminTab('oneriler')" id="tabBtn-oneriler" class="admin-tab flex-1 min-w-[120px] py-3 px-3 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
+                        <i class="fa-solid fa-lightbulb mr-1.5"></i> Öneriler
+                    </button>
+                    <button onclick="switchAdminTab('destekler')" id="tabBtn-destekler" class="admin-tab flex-1 min-w-[120px] py-3 px-3 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
+                        <i class="fa-solid fa-headset mr-1.5"></i> Destek
                     </button>
                 </div>
 
@@ -532,6 +658,18 @@
                         <button onclick="yukleAdminBasvurular()" class="text-xs text-purple-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
                     </div>
                     <div id="adminPendingList" class="space-y-3">
+                        <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
+                    </div>
+                </div>
+
+                <!-- Tab: Accepted Streamers (SİLME BURADA) -->
+                <div id="adminTab-onaylilar" class="admin-section space-y-4 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-white">Onaylı Yayıncılar (Listeden Kaldır)</h3>
+                        <button onclick="yukleAdminOnaylilar()" class="text-xs text-purple-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
+                    </div>
+                    <p class="text-xs text-zinc-500 -mt-2">Buradan sildiğin yayıncı “Destek Olan Yayıncılar” sayfasından da kalkar.</p>
+                    <div id="adminAcceptedList" class="space-y-3">
                         <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
                     </div>
                 </div>
@@ -563,7 +701,7 @@
     </main>
 
     <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-        <div class="glass-panel p-8 rounded-3xl border border-zinc-800 w-full max-w-md relative shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div class="glass-panel p-8 rounded-3xl border border-zinc-800 w-full max-w-md relative shadow-2xl auth-card">
             <button onclick="closeAuthModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -634,15 +772,47 @@
 
         // Initialize UI on load
         document.addEventListener('DOMContentLoaded', () => {
+            // Page loader animation
+            setTimeout(() => {
+                const loader = document.getElementById('pageLoader');
+                if (loader) loader.classList.add('hidden-loader');
+            }, 1200);
+
             updateUserUI();
             yukleYayincilar();
             yukleOneriler();
+            yukleAnaSayfaIstatistik();
             if (isAdminLoggedIn) {
                 document.getElementById('adminLoginBox').classList.add('hidden');
                 document.getElementById('adminPanelContent').classList.remove('hidden');
                 document.getElementById('adminBadge').classList.remove('hidden');
+                yukleAdminIstatistik();
             }
         });
+
+        function yukleAnaSayfaIstatistik() {
+            db.collection('basvurular').where('status', '==', 'accepted').get()
+                .then(s => { const el = document.getElementById('statYayinci'); if (el) el.textContent = s.size; })
+                .catch(() => {});
+            db.collection('oneriler').get()
+                .then(s => { const el = document.getElementById('statOneri'); if (el) el.textContent = s.size; })
+                .catch(() => {});
+        }
+
+        function yukleAdminIstatistik() {
+            Promise.all([
+                db.collection('basvurular').where('status', '==', 'pending').get(),
+                db.collection('basvurular').where('status', '==', 'accepted').get(),
+                db.collection('oneriler').get(),
+                db.collection('destekler').get()
+            ]).then(([p, a, o, d]) => {
+                const set = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+                set('statPending', p.size);
+                set('statAccepted', a.size);
+                set('statSuggestions', o.size);
+                set('statTickets', d.size);
+            }).catch(() => {});
+        }
 
         // Toast Notification System
         function showToast(message, type = 'success') {
@@ -1157,10 +1327,11 @@
                 document.getElementById('adminPanelContent').classList.remove('hidden');
                 document.getElementById('adminBadge').classList.remove('hidden');
                 document.getElementById('adminSifre').value = '';
-                showToast('Admin girişi başarılı!', 'success');
+                showToast('Admin girişi başarılı! Hoş geldin.', 'success');
+                yukleAdminIstatistik();
                 switchAdminTab('basvurular');
             } else {
-                showToast('Hatalı admin şifresi!', 'error');
+                showToast('Hatalı admin şifresi! Sadece yetkili girebilir.', 'error');
             }
         }
 
@@ -1192,8 +1363,59 @@
             }
 
             if (tabName === 'basvurular') yukleAdminBasvurular();
+            if (tabName === 'onaylilar') yukleAdminOnaylilar();
             if (tabName === 'oneriler') yukleAdminOneriler();
             if (tabName === 'destekler') yukleAdminDestekler();
+            yukleAdminIstatistik();
+        }
+
+        // Onaylı yayıncıları listele + sil
+        function yukleAdminOnaylilar() {
+            const liste = document.getElementById('adminAcceptedList');
+            if (!liste) return;
+            liste.innerHTML = '<div class="text-zinc-500 text-sm py-6 text-center"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Yükleniyor...</div>';
+
+            db.collection('basvurular').where('status', '==', 'accepted').get()
+                .then(snap => {
+                    if (snap.empty) {
+                        liste.innerHTML = '<div class="glass-panel p-6 rounded-xl text-center text-zinc-500 text-sm">Henüz onaylı yayıncı yok.</div>';
+                        return;
+                    }
+                    liste.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        liste.innerHTML += `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-red-500/30 transition-all">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold shrink-0">
+                                        ${(d.isim || '?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-white text-base truncate">${escapeHtml(d.isim)} ${escapeHtml(d.soyad || '')}</h4>
+                                        <a href="${escapeHtml(d.kanal)}" target="_blank" class="text-xs text-purple-400 hover:underline block truncate">${escapeHtml(d.kanal)}</a>
+                                        <span class="text-[11px] text-zinc-500">Gönderen: ${escapeHtml(d.user || '—')}</span>
+                                    </div>
+                                </div>
+                                <button onclick="adminSilOnayliYayinci('${doc.id}')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-semibold border border-red-500/40 flex items-center justify-center gap-2 transition">
+                                    <i class="fa-solid fa-trash"></i> Listeden Sil
+                                </button>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    liste.innerHTML = '<div class="text-red-400 text-sm py-6 text-center">Yüklenirken hata oluştu.</div>';
+                });
+        }
+
+        function adminSilOnayliYayinci(id) {
+            if (!confirm('Bu yayıncıyı destek listesinden tamamen silmek istediğine emin misin?')) return;
+            db.collection('basvurular').doc(id).delete()
+                .then(() => {
+                    showToast('Yayıncı listeden silindi.', 'success');
+                    yukleAdminOnaylilar();
+                    yukleYayincilar();
+                    yukleAdminIstatistik();
+                    yukleAnaSayfaIstatistik();
+                }).catch(() => showToast('Silme başarısız.', 'error'));
         }
 
         // Admin: Streamer Applications
@@ -1235,6 +1457,8 @@
                     showToast('Yayıncı başvurusu onaylandı!', 'success');
                     yukleAdminBasvurular();
                     yukleYayincilar();
+                    yukleAdminIstatistik();
+                    yukleAnaSayfaIstatistik();
                 }).catch(() => showToast('İşlem başarısız.', 'error'));
         }
 
