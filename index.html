@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamForge Ultimate - Streaming Topluluk Platformu</title>
+    <title>StreamPulse Ultimate - Streaming Topluluk Platformu</title>
     <!-- Tailwind CSS for modern utility styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for icons -->
@@ -110,6 +110,46 @@
             border-radius: 50%; z-index: -1; pointer-events: none;
             animation: float 10s ease-in-out infinite reverse;
         }
+        /* Live player iframe styling */
+        .live-player-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 */
+            background: #0a0a0c;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(139, 92, 246, 0.25);
+        }
+        .live-player-wrap iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .live-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+        .live-badge .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #fff;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
@@ -125,7 +165,7 @@
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-bolt text-white text-lg"></i>
             </div>
-            <span class="text-xl font-extrabold tracking-tight text-white">Stream<span class="text-amber-400">Forge</span></span>
+            <span class="text-xl font-extrabold tracking-tight text-white">Stream<span class="text-amber-400">Pulse</span></span>
         </div>
 
         <!-- Desktop Navigation -->
@@ -161,7 +201,7 @@
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
                     <i class="fa-solid fa-bolt text-white"></i>
                 </div>
-                <span class="text-lg font-extrabold text-white">Stream<span class="text-amber-400">Forge</span></span>
+                <span class="text-lg font-extrabold text-white">Stream<span class="text-amber-400">Pulse</span></span>
             </div>
             <button onclick="toggleMobileMenu()" class="p-2 text-zinc-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -216,7 +256,7 @@
                         <i class="fa-solid fa-shield-heart"></i>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2">Yayıncı Destek Ağı</h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed">Başvurunuz onaylandığında kanalınız binlerce kullanıcıya vitrinde sergilenir, dayanışma büyür.</p>
+                    <p class="text-zinc-400 text-sm leading-relaxed">Başvurunuz onaylandığında kanalınız binlerce kullanıcıya vitrinde sergilenir, canlı yayınınız da doğrudan izlenebilir.</p>
                 </div>
                 <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-emerald-500/50 transition-all group">
                     <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl mb-4 group-hover:scale-110 transition-transform">
@@ -332,22 +372,22 @@
             </div>
         </div>
 
-        <!-- 4. DESTEK OLAN YAYINCILAR -->
+        <!-- 4. DESTEK OLAN YAYINCILAR (GELİŞTİRİLMİŞ + CANLI YAYIN) -->
         <div id="yayincilar" class="page">
             <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
                         <i class="fa-solid fa-heart text-red-400"></i> Destek Olan Yayıncılar
                     </h2>
-                    <p class="text-zinc-400 text-sm mt-1">StreamForge topluluğuna katılan ve başvurusu onaylanan değerli içerik üreticileri.</p>
+                    <p class="text-zinc-400 text-sm mt-1">StreamPulse topluluğuna katılan ve başvurusu onaylanan değerli içerik üreticileri. Her kartın altında canlı yayın player’ı bulunur.</p>
                 </div>
                 <button onclick="showPage('basvuru')" class="px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 transition-all flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-purple-400"></i> Yayıncı Olmak İstiyorum
                 </button>
             </div>
 
-            <!-- Streamer Grid -->
-            <div id="streamerList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <!-- Streamer Grid - expanded for video -->
+            <div id="streamerList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div class="col-span-full py-12 text-center text-zinc-500">
                     <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
                     <p>Yayıncılar yükleniyor...</p>
@@ -362,7 +402,7 @@
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center justify-center gap-3">
                         <i class="fa-solid fa-file-pen text-blue-400"></i> Yayıncı Başvurusu
                     </h2>
-                    <p class="text-zinc-400 text-sm mt-1">Kanalınızı topluluğumuzun vitrinine eklemek ve destek ağına dahil olmak için başvurun.</p>
+                    <p class="text-zinc-400 text-sm mt-1">Kanalınızı topluluğumuzun vitrinine eklemek ve destek ağına dahil olmak için başvurun. Onaylandıktan sonra canlı yayınınız da listede görünür.</p>
                 </div>
 
                 <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800 shadow-xl">
@@ -558,7 +598,7 @@
                 <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
                     <i class="fa-solid fa-bolt text-white text-xs"></i>
                 </div>
-                <span class="font-bold text-zinc-300">StreamForge Ultimate</span>
+                <span class="font-bold text-zinc-300">StreamPulse Ultimate</span>
             </div>
             <p>© 2026 İçerik Üreticileri Topluluk Platformu. Tüm hakları saklıdır.</p>
             <div class="flex items-center gap-4 text-xs text-zinc-400">
@@ -570,7 +610,7 @@
     </footer>
 
     <script>
-        // Firebase Configuration
+        // Firebase Configuration (orijinal proje korundu)
         const firebaseConfig = {
             apiKey: "AIzaSyDUtHW0VnS4fe12kuO5cM2E4f2LSvZE-1o",
             authDomain: "streamforge-1381b.firebaseapp.com",
@@ -693,7 +733,7 @@
                 switchBtn.textContent = 'Kayıt Ol';
             } else {
                 title.textContent = 'Yeni Hesap Oluştur';
-                desc.textContent = 'StreamForge topluluğuna katılmak için hemen kayıt olun.';
+                desc.textContent = 'StreamPulse topluluğuna katılmak için hemen kayıt olun.';
                 btn.textContent = 'Kayıt Ol ve Giriş Yap';
                 switchText.textContent = 'Zaten hesabınız var mı?';
                 switchBtn.textContent = 'Giriş Yap';
@@ -725,7 +765,6 @@
             }
 
             if (authMode === 'register') {
-                // Register logic (stores in localStorage & Firestore users collection if wanted)
                 currentUser = username;
                 localStorage.setItem('sf_user', username);
                 db.collection('users').add({
@@ -785,7 +824,7 @@
                         box.innerHTML += `
                             <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3">
                                 <span class="text-[11px] text-zinc-500 mb-1 px-1">${d.user} • ${timeStr}</span>
-                                <div class="max-w-[85% ] sm:max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-purple-600 text-white rounded-tr-none shadow-lg shadow-purple-600/20' : 'glass-panel text-zinc-200 rounded-tl-none border border-zinc-800'}">
+                                <div class="max-w-[85%] sm:max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-purple-600 text-white rounded-tr-none shadow-lg shadow-purple-600/20' : 'glass-panel text-zinc-200 rounded-tl-none border border-zinc-800'}">
                                     ${escapeHtml(d.text)}
                                 </div>
                             </div>`;
@@ -823,7 +862,7 @@
 
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, m => map[m]);
+            return String(text || '').replace(/[&<>"']/g, m => map[m]);
         }
 
         // Suggestions & Discussions Management
@@ -886,7 +925,78 @@
                 });
         }
 
-        // Streamers Network
+        // === CANLI YAYIN EMBED YARDIMCILARI ===
+        function getChannelSlugAndPlatform(kanalUrl) {
+            try {
+                const url = new URL(kanalUrl);
+                const host = url.hostname.toLowerCase();
+                let path = url.pathname.replace(/^\/+|\/+$/g, ''); // trim slashes
+                // Kick: kick.com/username
+                if (host.includes('kick.com')) {
+                    const slug = path.split('/')[0] || path;
+                    if (slug) return { platform: 'kick', slug };
+                }
+                // Twitch: twitch.tv/username
+                if (host.includes('twitch.tv')) {
+                    const slug = path.split('/')[0] || path;
+                    if (slug) return { platform: 'twitch', slug };
+                }
+                // YouTube live / channel
+                if (host.includes('youtube.com') || host.includes('youtu.be')) {
+                    return { platform: 'youtube', slug: path || kanalUrl };
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function buildLiveEmbedHtml(kanalUrl) {
+            const info = getChannelSlugAndPlatform(kanalUrl);
+            if (!info) {
+                return `
+                    <div class="live-player-wrap flex items-center justify-center bg-zinc-900/80">
+                        <div class="text-center p-4">
+                            <i class="fa-solid fa-link-slash text-zinc-600 text-2xl mb-2"></i>
+                            <p class="text-xs text-zinc-500">Geçerli Kick / Twitch linki gerekli</p>
+                            <a href="${escapeHtml(kanalUrl)}" target="_blank" class="text-purple-400 text-xs hover:underline mt-1 inline-block">Kanala Git</a>
+                        </div>
+                    </div>`;
+            }
+
+            let embedSrc = '';
+            if (info.platform === 'kick') {
+                embedSrc = `https://player.kick.com/${encodeURIComponent(info.slug)}`;
+            } else if (info.platform === 'twitch') {
+                // parent parametresi mevcut domain için
+                const parent = window.location.hostname || 'localhost';
+                embedSrc = `https://player.twitch.tv/?channel=${encodeURIComponent(info.slug)}&parent=${parent}&muted=true`;
+            } else {
+                // YouTube için sadece link göster (canlı embed için video ID gerekir)
+                return `
+                    <div class="live-player-wrap flex items-center justify-center bg-zinc-900/80">
+                        <div class="text-center p-4">
+                            <i class="fa-brands fa-youtube text-red-500 text-2xl mb-2"></i>
+                            <p class="text-xs text-zinc-400 mb-2">YouTube canlı yayın</p>
+                            <a href="${escapeHtml(kanalUrl)}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-600/20 text-red-300 text-xs font-semibold border border-red-500/30 hover:bg-red-600/30 transition">
+                                <i class="fa-solid fa-play"></i> Canlı İzle
+                            </a>
+                        </div>
+                    </div>`;
+            }
+
+            return `
+                <div class="live-player-wrap">
+                    <div class="live-badge"><span class="dot"></span> CANLI</div>
+                    <iframe
+                        src="${embedSrc}"
+                        allowfullscreen
+                        allow="autoplay; encrypted-media; picture-in-picture"
+                        loading="lazy"
+                        title="Canlı Yayın - ${escapeHtml(info.slug)}">
+                    </iframe>
+                </div>`;
+        }
+
+        // Streamers Network - GELİŞTİRİLMİŞ (canlı yayın player her kartta)
         function yukleYayincilar() {
             const liste = document.getElementById('streamerList');
             if (!liste) return;
@@ -898,6 +1008,9 @@
                             <div class="col-span-full py-12 text-center text-zinc-500 glass-panel rounded-2xl border border-zinc-800">
                                 <i class="fa-solid fa-users-slash text-3xl mb-3 text-zinc-600"></i>
                                 <p class="text-sm">Henüz onaylanmış yayıncı bulunmuyor.</p>
+                                <button onclick="showPage('basvuru')" class="mt-4 px-5 py-2 rounded-full text-sm font-semibold text-purple-300 bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 transition">
+                                    İlk yayıncı sen ol
+                                </button>
                             </div>`;
                         return;
                     }
@@ -905,20 +1018,40 @@
                     snap.forEach(doc => {
                         const d = doc.data();
                         const initial = (d.isim || '?').charAt(0).toUpperCase();
+                        const fullName = `${escapeHtml(d.isim || '')} ${escapeHtml(d.soyad || '')}`.trim();
+                        const kanal = d.kanal || '#';
+
                         liste.innerHTML += `
-                            <div class="glass-panel p-6 rounded-2xl border border-zinc-800 text-center hover:border-purple-500/50 hover:scale-[1.02] transition-all group shadow-xl">
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg shadow-purple-600/30 group-hover:rotate-3 transition-transform">
-                                    ${initial}
+                            <div class="glass-panel rounded-2xl border border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all group shadow-xl flex flex-col">
+                                <!-- Canlı Yayın Player -->
+                                <div class="p-3 pb-0">
+                                    ${buildLiveEmbedHtml(kanal)}
                                 </div>
-                                <h3 class="font-bold text-white text-base mb-1">${escapeHtml(d.isim)} ${escapeHtml(d.soyad || '')}</h3>
-                                <div class="mb-4">
-                                    <a href="${escapeHtml(d.kanal)}" target="_blank" class="text-xs text-purple-400 hover:underline flex items-center justify-center gap-1">
-                                        <i class="fa-solid fa-square-arrow-up-right"></i> Kanalı Ziyaret Et
-                                    </a>
+
+                                <!-- Yayıncı Bilgileri -->
+                                <div class="p-5 flex flex-col flex-1">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-purple-600/30 group-hover:rotate-3 transition-transform shrink-0">
+                                            ${initial}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h3 class="font-bold text-white text-base truncate">${fullName}</h3>
+                                            <a href="${escapeHtml(kanal)}" target="_blank" rel="noopener" class="text-xs text-purple-400 hover:underline flex items-center gap-1 truncate">
+                                                <i class="fa-solid fa-square-arrow-up-right text-[10px]"></i>
+                                                <span class="truncate">${escapeHtml(kanal.replace(/^https?:\/\//, ''))}</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto flex items-center justify-between gap-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+                                            <i class="fa-solid fa-circle-check text-[10px]"></i> Onaylı Yayıncı
+                                        </span>
+                                        <a href="${escapeHtml(kanal)}" target="_blank" rel="noopener"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-600/20 text-purple-300 text-xs font-semibold border border-purple-500/30 hover:bg-purple-600/30 transition">
+                                            <i class="fa-solid fa-play text-[10px]"></i> Kanala Git
+                                        </a>
+                                    </div>
                                 </div>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
-                                    <i class="fa-solid fa-circle-check text-[10px]"></i> Onaylı Yayıncı
-                                </span>
                             </div>`;
                     });
                 }).catch(() => {
@@ -1006,7 +1139,7 @@
                             <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm flex justify-between items-center">
                                 <div>
                                     <span class="text-purple-400 font-semibold block text-xs mb-1">${escapeHtml(d.kategori)}</span>
-                                    <p class="text-zinc-300 text-xs">${escapeHtml(d.mesaj.substring(0, 50))}...</p>
+                                    <p class="text-zinc-300 text-xs">${escapeHtml((d.mesaj || '').substring(0, 50))}...</p>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">${d.status}</span>
                             </div>`;
