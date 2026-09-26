@@ -248,7 +248,7 @@
         <nav class="hidden lg:flex items-center gap-1 bg-zinc-900/60 p-1.5 rounded-full border border-zinc-800/80">
             <button onclick="showPage('home')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="home">Ana Sayfa</button>
             <button onclick="showPage('chat')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="chat">Global Sohbet</button>
-            <button onclick="showPage('tartisma')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="tartisma">Tartışma & Öneriler</button>
+            <button onclick="showPage('minecraft')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="minecraft"><i class="fa-solid fa-cube text-emerald-400 mr-1"></i> Minecraft</button>
             <button onclick="showPage('yayincilar')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="yayincilar">Destek Yayıncılar</button>
             <button onclick="showPage('basvuru')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="basvuru">Yayıncı Başvurusu</button>
             <button onclick="showPage('destek')" class="nav-tab px-4 py-2 rounded-full text-sm font-medium transition-all text-zinc-300 hover:text-white hover:bg-zinc-800/50" data-target="destek">7/24 Destek</button>
@@ -284,7 +284,7 @@
         <div class="flex flex-col gap-2.5 flex-1 overflow-y-auto py-2">
             <button onclick="showPage('home'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-house mr-3 text-purple-400"></i> Ana Sayfa</button>
             <button onclick="showPage('chat'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-comments mr-3 text-purple-400"></i> Global Sohbet</button>
-            <button onclick="showPage('tartisma'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-lightbulb mr-3 text-purple-400"></i> Tartışma & Öneriler</button>
+            <button onclick="showPage('minecraft'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-cube mr-3 text-emerald-400"></i> Minecraft Yardım</button>
             <button onclick="showPage('yayincilar'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-heart mr-3 text-purple-400"></i> Destek Yayıncılar</button>
             <button onclick="showPage('basvuru'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-file-pen mr-3 text-purple-400"></i> Yayıncı Başvurusu</button>
             <button onclick="showPage('destek'); toggleMobileMenu();" class="text-left py-3 px-4 rounded-xl bg-zinc-900 text-zinc-200 font-medium hover:bg-purple-600/20"><i class="fa-solid fa-headset mr-3 text-purple-400"></i> 7/24 Destek</button>
@@ -306,15 +306,15 @@
                     Streaming Dünyasını Birlikte <span class="gradient-text">İyileştiriyoruz</span>
                 </h1>
                 <p class="text-zinc-200 text-base sm:text-lg max-w-2xl mb-10 leading-relaxed drop-shadow">
-                    Kick ve diğer platformlardaki moderasyon sıkıntılarını, ödeme sorunlarını konuşuyor, ortak çözümler üretiyor ve içerik üreticilerine 7/24 kesintisiz destek sağlıyoruz.
+                    Kick & canlı yayın desteği + Minecraft sunucu logo, yazı ve kurulum yardımı. Toplulukla birlikte her şeyi çözüyoruz.
                 </p>
                 <div class="flex flex-wrap items-center justify-center gap-4">
                     <button onclick="showPage('chat')" class="px-8 py-4 rounded-full text-white font-semibold gradient-btn shadow-xl shadow-purple-600/40 flex items-center gap-3 group">
                         <i class="fa-solid fa-comments text-lg"></i> Sohbete Hemen Katıl
                         <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </button>
-                    <button onclick="showPage('yayincilar')" class="px-8 py-4 rounded-full text-white font-semibold bg-black/50 backdrop-blur hover:bg-black/70 transition-all flex items-center gap-2 border border-white/20">
-                        <i class="fa-solid fa-users text-purple-300"></i> Desteklenen Yayıncılar
+                    <button onclick="showPage('minecraft')" class="px-8 py-4 rounded-full text-white font-semibold bg-emerald-600/80 hover:bg-emerald-500 transition-all flex items-center gap-2 border border-emerald-400/30">
+                        <i class="fa-solid fa-cube"></i> Minecraft Yardım
                     </button>
                 </div>
                 <!-- Stats strip -->
@@ -473,6 +473,95 @@
             </div>
         </div>
 
+        <!-- MINECRAFT YARDIM SAYFASI -->
+        <div id="minecraft" class="page">
+            <div class="mb-8 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs font-semibold mb-4">
+                    <i class="fa-solid fa-cube"></i> Minecraft Sunucu Hizmetleri
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-3">
+                    Logo · Yazı · Sunucu — <span class="gradient-text">Her Şeyi Yapıyorum</span>
+                </h2>
+                <p class="text-zinc-400 text-sm sm:text-base max-w-2xl mx-auto">
+                    Minecraft sunucun için logo tasarımı, yazı / banner tasarımı, sunucu kurulumu ve yapılandırması. Takıldığın her konuda yardım ederim.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-emerald-500/40 transition-all group text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-palette"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-lg mb-2">Logo Tasarımı</h3>
+                    <p class="text-zinc-400 text-sm">Sunucu adın için modern, neon veya klasik Minecraft tarzı logo. Discord / web / tablo için uygun format.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-blue-500/40 transition-all group text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/15 flex items-center justify-center text-blue-400 text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-font"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-lg mb-2">Yazı & Banner</h3>
+                    <p class="text-zinc-400 text-sm">MOTD, tab list, Discord banner, sunucu listesi yazıları. Okunaklı ve şık tipografi.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-zinc-800 hover:border-purple-500/40 transition-all group text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-500/15 flex items-center justify-center text-purple-400 text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-lg mb-2">Sunucu Kurulum</h3>
+                    <p class="text-zinc-400 text-sm">Paper / Purpur / Spigot kurulum, plugin, permission, anti-cheat, economy — her şeyde yardımcı olurum.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-emerald-400"></i> Neler Yapıyorum?
+                    </h3>
+                    <ul class="space-y-3 text-sm text-zinc-300">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Sunucu logosu (PNG / transparent)</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Discord sunucu banner & ikon</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> MOTD ve tab list yazı tasarımı</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Paper / Purpur kurulum rehberi</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Plugin önerisi ve ayar yardımı</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Permission (LuckPerms) kurulumu</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Whitelist, ban, antispam çözümleri</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i> Genel sunucu sorunlarında 7/24 destek</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-zinc-800">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane text-purple-400"></i> Yardım Talebi Gönder
+                    </h3>
+                    <p class="text-zinc-400 text-sm mb-4">Ne istediğini yaz, admin paneline düşer. En kısa sürede dönüş yapılır.</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1 uppercase tracking-wider">Ne lazım?</label>
+                            <select id="mcKategori" class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                                <option value="Logo Tasarımı">Logo Tasarımı</option>
+                                <option value="Yazı / Banner">Yazı / Banner Tasarımı</option>
+                                <option value="Sunucu Kurulum">Sunucu Kurulum / Ayar</option>
+                                <option value="Plugin / Permission">Plugin / Permission</option>
+                                <option value="Diğer">Diğer / Her şey</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1 uppercase tracking-wider">Detay</label>
+                            <textarea id="mcMesaj" rows="4" placeholder="Örn: Survival sunucum için yeşil-mor neon logo istiyorum, isim: CraftRealm..."
+                                class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1 uppercase tracking-wider">İletişim (Discord / IG opsiyonel)</label>
+                            <input type="text" id="mcIletisim" placeholder="discord: isim#0000"
+                                class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <button onclick="gonderMcTalep()" class="w-full py-3.5 rounded-xl text-white font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-rocket"></i> Talebi Gönder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 4. DESTEK OLAN YAYINCILAR (GELİŞTİRİLMİŞ + CANLI YAYIN) -->
         <div id="yayincilar" class="page">
             <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -480,7 +569,7 @@
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
                         <i class="fa-solid fa-heart text-red-400"></i> Destek Olan Yayıncılar
                     </h2>
-                    <p class="text-zinc-400 text-sm mt-1">StreamPulse topluluğuna katılan ve başvurusu onaylanan değerli içerik üreticileri. Her kartın altında canlı yayın player’ı bulunur.</p>
+                    <p class="text-zinc-400 text-sm mt-1">StreamPulse topluluğuna katılan ve başvurusu onaylanan değerli içerik üreticileri. Yönetim sadece admin panelinden yapılır.</p>
                 </div>
                 <button onclick="showPage('basvuru')" class="px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 transition-all flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-purple-400"></i> Yayıncı Olmak İstiyorum
@@ -649,6 +738,9 @@
                     <button onclick="switchAdminTab('destekler')" id="tabBtn-destekler" class="admin-tab flex-1 min-w-[120px] py-3 px-3 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
                         <i class="fa-solid fa-headset mr-1.5"></i> Destek
                     </button>
+                    <button onclick="switchAdminTab('minecraft')" id="tabBtn-minecraft" class="admin-tab flex-1 min-w-[120px] py-3 px-3 rounded-xl text-sm font-semibold transition-all text-zinc-400 hover:text-white hover:bg-zinc-800/50">
+                        <i class="fa-solid fa-cube mr-1.5"></i> MC Talepler
+                    </button>
                 </div>
 
                 <!-- Tab 1: Pending Streamer Applications -->
@@ -692,6 +784,17 @@
                         <button onclick="yukleAdminDestekler()" class="text-xs text-purple-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
                     </div>
                     <div id="adminDestekList" class="space-y-3">
+                        <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
+                    </div>
+                </div>
+
+                <!-- Tab: Minecraft Talepleri -->
+                <div id="adminTab-minecraft" class="admin-section space-y-4 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-white">Minecraft Yardım Talepleri</h3>
+                        <button onclick="yukleAdminMcTalepler()" class="text-xs text-emerald-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Yenile</button>
+                    </div>
+                    <div id="adminMcList" class="space-y-3">
                         <div class="text-zinc-500 text-sm py-6 text-center">Yükleniyor...</div>
                     </div>
                 </div>
@@ -740,7 +843,8 @@
             </div>
             <p>© 2026 İçerik Üreticileri Topluluk Platformu. Tüm hakları saklıdır.</p>
             <div class="flex items-center gap-4 text-xs text-zinc-400">
-                <span class="hover:text-white cursor-pointer" onclick="showPage('chat')">Global Sohbet</span>
+                <span class="hover:text-white cursor-pointer" onclick="showPage('chat')">Sohbet</span>
+                <span class="hover:text-white cursor-pointer" onclick="showPage('minecraft')">Minecraft</span>
                 <span class="hover:text-white cursor-pointer" onclick="showPage('yayincilar')">Yayıncılar</span>
                 <span class="hover:text-white cursor-pointer" onclick="showPage('destek')">Destek</span>
             </div>
@@ -1366,7 +1470,68 @@
             if (tabName === 'onaylilar') yukleAdminOnaylilar();
             if (tabName === 'oneriler') yukleAdminOneriler();
             if (tabName === 'destekler') yukleAdminDestekler();
+            if (tabName === 'minecraft') yukleAdminMcTalepler();
             yukleAdminIstatistik();
+        }
+
+        function gonderMcTalep() {
+            if (!currentUser) {
+                showToast('Talep göndermek için giriş yapmalısınız!', 'error');
+                openAuthModal('login');
+                return;
+            }
+            const kategori = document.getElementById('mcKategori').value;
+            const mesaj = document.getElementById('mcMesaj').value.trim();
+            const iletisim = document.getElementById('mcIletisim').value.trim();
+            if (!mesaj) {
+                showToast('Lütfen detay yazın!', 'error');
+                return;
+            }
+            db.collection('mc_talepler').add({
+                user: currentUser,
+                kategori: kategori,
+                mesaj: mesaj,
+                iletisim: iletisim || '—',
+                status: 'Açık',
+                tarih: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('mcMesaj').value = '';
+                document.getElementById('mcIletisim').value = '';
+                showToast('Minecraft talebin gönderildi! En kısa sürede dönüş yapılır.', 'success');
+            }).catch(() => showToast('Gönderilemedi.', 'error'));
+        }
+
+        function yukleAdminMcTalepler() {
+            const liste = document.getElementById('adminMcList');
+            if (!liste) return;
+            liste.innerHTML = '<div class="text-zinc-500 text-sm py-6 text-center"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Yükleniyor...</div>';
+            db.collection('mc_talepler').orderBy('tarih', 'desc').get()
+                .then(snap => {
+                    if (snap.empty) {
+                        liste.innerHTML = '<div class="glass-panel p-6 rounded-xl text-center text-zinc-500 text-sm">Henüz Minecraft talebi yok.</div>';
+                        return;
+                    }
+                    liste.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        liste.innerHTML += `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">${escapeHtml(d.kategori)}</span>
+                                        <span class="text-xs text-zinc-400">@${escapeHtml(d.user)}</span>
+                                        <span class="text-xs text-zinc-500">${escapeHtml(d.iletisim || '')}</span>
+                                    </div>
+                                    <p class="text-zinc-300 text-sm leading-relaxed mt-1">${escapeHtml(d.mesaj)}</p>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button onclick="adminSilDokuman('mc_talepler', '${doc.id}', yukleAdminMcTalepler)" class="px-3.5 py-2 rounded-xl bg-red-600/20 text-red-400 text-xs font-semibold border border-red-500/30">Sil</button>
+                                </div>
+                            </div>`;
+                    });
+                }).catch(() => {
+                    liste.innerHTML = '<div class="text-red-400 text-sm py-6 text-center">Yüklenemedi.</div>';
+                });
         }
 
         // Onaylı yayıncıları listele + sil
